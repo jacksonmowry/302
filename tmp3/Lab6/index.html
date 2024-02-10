@@ -1,0 +1,75 @@
+<title> CS302 -- Lab 6 -- Sorting</title>
+
+<h1> CS302 -- Lab 6 -- Sorting</h1>
+<h3>
+<UL> <LI> CS302 -- Data Structures and Algorithms II
+<LI> <a href=http://web.eecs.utk.edu/~jplank>James S. Plank</a>
+<LI> <a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Labs/Lab6/index.html>This file:
+     <b>http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Labs/Lab6</b></a>
+<LI> Lab Directory: <b>/home/jplank/cs302/Labs/Lab6</b>
+</UL>
+</h3>
+
+<hr>
+<h2>What you Hand In</h2>
+
+As with labs 2 and 5, this lab is split into two labs on Canvas:
+
+<UL>
+<LI> Lab 6A: You submit <b>merge_1_sort.cpp</b>
+<LI> Lab 6B: You submit <b>quick_2_sort.cpp</b>
+</UL>
+Each of these is graded independently as a 50-point lab.
+
+<hr>
+<h2>Quicksort and Merge Sort</h2>
+
+Your job is clear -- write <b>quick_2_sort.cpp</b> and <b>merge_1_sort.cpp</b> 
+from the 
+<a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Notes/Sorting/>sorting lecture notes</a>.
+<p>
+In <b>quick_2_sort.cpp</b>, you implement Quicksort, choosing the partition as the median of 
+the first, middle and last element.  
+When the size is two, you do not partition, but just sort the two elements by hand.  
+See the lecture notes for how I calculate the middle element.
+<p>
+To compile and test, copy the files <b>sort_driver_lab.cpp</b>, 
+<b>sorting.hpp</b> and <b>makefile</b> from the
+<a href=http://web.eecs.utk.edu/~jplank/plank/classes/cs302/Notes/Sorting/>sorting lecture note
+directory</a>.  On the EECS machines, these are in the directory:
+
+<p><center><table border=3 cellpadding=3><td><pre>
+<b>/home/jplank/cs302/Notes/Sorting</b>
+</pre></td></table></center><p>
+
+If you type <b>"make clean ; make lab"</b>, it will compile your <b>merge_1_sort.cpp</b> and
+<b>quick_2_sort.cpp</b> with <b>sort_driver_lab.cpp</b>, and create the executables
+<b>merge_1_lab_sort</b> and <b>quick_2_lab_sort</b>.  
+You can use the executables in the sorting lecture note directory to test yourself.
+Those are the ones against which your programs will be graded.
+<p>
+Make your output match mine
+<i>exactly</i>.  See the lecture notes for detail on the output of the two programs.
+<p>
+Whenever you use a seed that is a multiple of 2000, the driver program will
+produce vectors with lots of duplicate entries.  
+
+<hr>
+<h3>A note on quicksort and duplicate entries</h3>
+
+You'll note that there are six cases of duplicate entries for which I haven't specified
+what you should do with the pivots.  These are when two of the three candidates for the 
+pivot equal each other, and the third doesn't.  This has caused students consternation 
+in the past.  To figure this out, you need to generate the six cases, and then see what
+my program does with each of them.  Then, you do the same thing.
+<p>
+To help with this, there is a program called <b>quick_2_stdin</b>, which 
+runs on standard input.  That way, you can see how to handle the six cases.  For
+example:
+
+<pre>
+UNIX> <font color=darkred><b>echo 0 2 3 4 1 6 7 8 1 | quick_2_stdin | head -n 2</b></font>
+S:     0     9       0.00 2.00 3.00 4.00 1.00 6.00 7.00 8.00 1.00
+M:     0     9  1.00 1.00 2.00 3.00 4.00 1.00 6.00 7.00 8.00 0.00
+UNIX> <font color=darkred><b></b></font>
+</pre>
