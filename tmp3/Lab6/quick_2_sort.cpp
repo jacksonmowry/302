@@ -6,7 +6,23 @@
 using namespace std;
 
 void recursive_sort(vector<double> &v, int start, int size, int print) {
-  if (size <= 2) {
+  if (size > 1) {
+    printf("S: %5d %5d %5s ", start, size, "");
+    for (size_t i = 0; i < v.size(); i++) {
+      printf("%2.2f", v[i]);
+      if (i != v.size() - 1) {
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
+  if (size <= 1) {
+    return;
+  }
+  if (size == 2) {
+    if (v[start] > v[start + 1]) {
+      swap(v[start], v[start + 1]);
+    }
     return;
   }
   double f = v[start];
@@ -14,7 +30,6 @@ void recursive_sort(vector<double> &v, int start, int size, int print) {
   double l = v[start + size - 1];
   vector<double> median = {f, m, l};
   sort(median.begin(), median.end());
-  printf("first: %f, middle: %f, last: %f, median: %f\n", f, m, l, median[1]);
   double pivot = median[1];
 
   if (median[1] == f) {
@@ -24,6 +39,15 @@ void recursive_sort(vector<double> &v, int start, int size, int print) {
   } else {
     swap(v[start], v[start + size - 1]);
   }
+
+  printf("M: %5d %5d %5.2f ", start, size, pivot);
+  for (size_t i = 0; i < v.size(); i++) {
+    printf("%2.2f", v[i]);
+    if (i != v.size() - 1) {
+      printf(" ");
+    }
+  }
+  printf("\n");
 
   int left = start + 1;
   int right = start + size - 1;
@@ -42,14 +66,47 @@ void recursive_sort(vector<double> &v, int start, int size, int print) {
     left++;
     right--;
   }
-  int first_larger;
+  int first_larger = start + 1;
+  while (v[first_larger] < pivot) {
+    first_larger++;
+  }
+  swap(v[start], v[first_larger - 1]);
+
+  printf("P: %5d %5d %5d ", start, size, first_larger - 1);
+  for (size_t i = 0; i < v.size(); i++) {
+    printf("%2.2f", v[i]);
+    if (i != v.size() - 1) {
+      printf(" ");
+    }
+  }
+  printf("\n");
+
+  int l_size = first_larger - 1;
+  int r_size = (start + size) - first_larger;
+  if (l_size < 2 && r_size < 2) {
+    return;
+  }
+  recursive_sort(v, start, first_larger - 1 - start, 0);
+  recursive_sort(v, first_larger, (start + size) - first_larger, 0);
+
+  if (start == 0 && size == v.size()) {
+    printf("%21s", "");
+    for (size_t i = 0; i < v.size(); i++) {
+      printf("%2.2f", v[i]);
+      if (i != v.size() - 1) {
+        printf(" ");
+      }
+    }
+    printf("\n");
+  }
 }
 
 int main() {
-  vector<double> v = {3, 2, 4, 9, 8, 5, 1};
+  vector<double> v = {5.77, 5.26, 6.49, 0.43, 6.09, 4.95,
+                      3.15, 3.46, 7.55, 6.82, 6.69, 3.62};
   recursive_sort(v, 0, v.size(), 0);
-  for (auto a : v) {
-    printf("%.0f ", a);
-  }
-  printf("\n");
+  /* for (auto a : v) { */
+  /*   printf("%.0f ", a); */
+  /* } */
+  /* printf("\n"); */
 }
