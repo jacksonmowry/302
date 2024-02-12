@@ -1,6 +1,6 @@
 #!/bin/sh 
 
-dir=/home/jplank/cs302/Labs/Lab9
+dir=.
 ge="$dir/Gradescript-Examples"
 
 if [ $# -ne 1 ]; then
@@ -15,7 +15,7 @@ else
   exit 1
 fi
 
-program=worddice
+program=mine
   
 if [ ! -f $program ]; then
   echo "Problem $enum is incorrect."
@@ -26,7 +26,7 @@ fi
 
 rm -f tmp-$enum-test-stdout.txt tmp-$enum-test-stderr.txt tmp-$enum-correct-stdout.txt tmp-$enum-correct-stderr.txt
 
-$dir/$program $ge/D$enum.txt $ge/W$enum.txt > tmp-$enum-correct-stdout.txt 2> tmp-$enum-correct-stderr.txt
+./plank_worddice $ge/D$enum.txt $ge/W$enum.txt > tmp-$enum-correct-stdout.txt 2> tmp-$enum-correct-stderr.txt
 ./$program  $ge/D$enum.txt $ge/W$enum.txt > tmp-$enum-test-stdout.txt 2> tmp-$enum-test-stderr.txt
 call="./$program $ge/D$enum.txt $ge/W$enum.txt"
 

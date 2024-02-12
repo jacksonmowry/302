@@ -16,8 +16,6 @@ struct Edge {
     Edge* reverse;
     int original;
     int residual;
-    int flow;
-    bool tmp;
 };
 
 enum NodeType {
@@ -33,23 +31,25 @@ struct Node {
     int visted;
     vector<Edge*> adj;
     Edge* backedge;
-    multimap<int, Node*>::iterator qit;
+    bool seen;
 };
 
 vector<Edge*> pathfind(vector<Node*>& graph, Node* source, Node* sink) {
+    for (auto n : graph) {
+        n->backedge = nullptr;
+        n->visted = false;
+    }
     vector<Edge*> path;
     multimap<int, Node*> q;
-    int flow;
-    source->qit = q.emplace(INT32_MAX, source);
+    q.emplace(1, source);
     while (!q.empty()) {
         pair<int, Node*> p = *q.begin();
+        p.second->visted = true;
         q.erase(q.begin());
-        p.second->qit = q.end();
         if (p.second == sink) {
             // Found a route to the end
             Node* cur = p.second;
             while (cur != source) {
-                // printf("type %d\n", cur->type);
                 path.push_back(cur->backedge);
                 cur = cur->backedge->from;
             }
@@ -57,115 +57,129 @@ vector<Edge*> pathfind(vector<Node*>& graph, Node* source, Node* sink) {
             return path;
         }
         for (Edge* e : p.second->adj) {
-            if (e->to != source &&
-                e->original > e->flow) { // if pred[e.t] == null
-                // add to pred
+            if (e->original == 1 &&
+                !e->to->visted) { // only follow paths orig=1
                 e->to->backedge = e;
-                e->to->qit = q.emplace(e->residual, e->to);
+                q.emplace(e->residual, e->to);
             }
         }
     }
 
+    path.clear();
     return path;
 }
 
 int main(int argc, char** argv) {
-    vector<Node*> graph;
-    graph.push_back(new Node{SOURCE, {0}, 0, {}, nullptr});
-
-    ifstream dice(argv[1]);
     ifstream words(argv[2]);
-
     string input;
-    while (dice >> input) {
-        graph.push_back(new Node{DIE, {0}, 0, {}, nullptr});
-        graph.back()->adj.push_back(
-            new Edge{graph.back(), graph[0], nullptr, 0, 1, 1, false});
-        graph[0]->adj.push_back(new Edge{graph[0], graph.back(),
-                                         graph.back()->adj.back(), 1, 0, 0,
-                                         false});
-        for (auto c : input) {
-            graph.back()->letters[c] = true;
-        }
-    }
-
     while (words >> input) {
-        // need to reset all edges back to default values first
-        for (Node* n : graph) {
-            n->backedge = nullptr;
-            size_t prev = n->adj.size();
-            for (ssize_t i = n->adj.size() - 1; i >= 0; i -= 1) {
-                if (n->adj[i]->tmp) {
-                    n->adj.erase(n->adj.begin() + i);
-                }
-            }
-            assert(prev >= n->adj.size());
-            for (size_t i = 0; i < n->adj.size() - 1; i += 2) {
-                if (n->adj[i]->residual == 1) {
-                    // reverse edge
-                    n->adj[i]->flow = 1;
-                } else {
+        string desired_word = input;
+        vector<Node*> graph;
+        graph.push_back(new Node{SOURCE, {0}, 0, {}, nullptr});
 
-                    // forward edge
-                    n->adj[i + 1]->flow = 0;
-                }
+        ifstream dice(argv[1]);
+
+        while (dice >> input) {
+            graph.push_back(new Node{DIE, {0}, 0, {}, nullptr});
+            // Reverse Dice -> Source
+            graph.back()->adj.push_back(
+                new Edge{graph.back(), graph[0], nullptr, 0, 1});
+            // Forward Source -> Dice
+            graph[0]->adj.push_back(new Edge{
+                graph[0], graph.back(), graph.back()->adj.back(), 1, 0});
+
+            // Update reverse edge "reverse"
+            graph.back()->adj.back()->reverse = graph[0]->adj.back();
+
+            for (auto c : input) {
+                graph.back()->letters[c] = true;
             }
         }
 
-        vector<Node*> copy = graph;
-        size_t first_letter = copy.size();
-        for (auto c : input) {
-            copy.push_back(new Node{LETTER, {0}, 0, {}, nullptr});
-            copy.back()->letters[c] = true;
-            for (size_t i = 1; i < copy.size() && copy[i]->type == DIE;
+        size_t first_letter = graph.size();
+        for (auto c : desired_word) {
+            graph.push_back(new Node{LETTER, {0}, 0, {}, nullptr});
+            graph.back()->letters[c] = true;
+            for (size_t i = 1; i < graph.size() && graph[i]->type == DIE;
                  i++) {
-                if (copy[i]->letters[c]) {
-                    copy.back()->adj.push_back(
-                        new Edge{copy.back(), copy[i], nullptr, 0, 1, 1,
-                                 true}); // reverse edge
-                    copy[i]->adj.push_back(
-                        new Edge{copy[i],
-                                 copy.back(), // actual edge
-                                 copy.back()->adj.back(), 1, 0, 0, true});
-                    copy.back()->adj.back()->reverse = copy[i]->adj.back();
+                if (graph[i]->letters[c]) {
+                    // reverse edge Letter -> Dice
+                    graph.back()->adj.push_back(
+                        new Edge{graph.back(), graph[i], nullptr, 0, 1});
+                    // actual edge Dice -> Letter
+                    graph[i]->adj.push_back(
+                        new Edge{graph[i], graph.back(),
+                                 graph.back()->adj.back(), 1, 0});
+                    // Update reverse edge "reverse"
+                    graph.back()->adj.back()->reverse =
+                        graph[i]->adj.back();
                 }
             }
         }
 
-        copy.push_back(new Node{SINK, {0}, 0, {}, nullptr});
+        graph.push_back(new Node{SINK, {0}, 0, {}, nullptr});
 
         // Make letters point to the sink
-        for (size_t i = first_letter; i < copy.size() - 1; i++) {
-            copy.back()->adj.push_back(
-                new Edge{copy.back(), copy[i], nullptr, 1, 0, 1, true});
-            copy[i]->adj.push_back(new Edge{copy[i], copy.back(),
-                                            copy.back()->adj.back(), 1, 0,
-                                            0, true});
-            copy.back()->adj.back()->reverse = copy[i]->adj.back();
+        for (size_t i = first_letter; i < graph.size() - 1; i++) {
+            // Reverse Sink -> Letter
+            graph.back()->adj.push_back(
+                new Edge{graph.back(), graph[i], nullptr, 1, 0});
+            // Forward Letter -> Sink
+            graph[i]->adj.push_back(new Edge{
+                graph[i], graph.back(), graph.back()->adj.back(), 1, 0});
+            // Update reverse edge "reverse"
+            graph.back()->adj.back()->reverse = graph[i]->adj.back();
         }
 
-        Node* source = copy[0];
-        Node* sink = copy.back();
+        Node* source = graph[0];
+        Node* sink = graph.back();
 
         int flow = 0;
         vector<Edge*> path;
-        while ((path = pathfind(copy, source, sink)).size()) {
+        while ((path = pathfind(graph, source, sink)).size()) {
             flow++;
             for (auto e : path) {
-                e->flow = 1;
-                e->reverse->flow = 0;
-                printf("node type: %d\n", e->from->type);
-                for (int i = 65; i < 91; i++) {
-                    printf("%c ", (e->from->letters[i]) ? i : ' ');
-                }
-                printf("\n");
+                // original=0 & residual=1 on a normal edge
+                // original=1 & residual=0  on a reverse edge
+                e->original = 0;
+                e->residual = 1;
+                e->reverse->original = 1;
+                e->reverse->residual = 0;
             }
         }
-        printf("flow: %d\n", flow);
-        if (flow == input.size()) {
-            printf("can spell %s\n", input.c_str());
+        int count = 0;
+        vector<int> die_nums;
+        for (Edge* e : sink->adj) {
+            if (e->reverse->residual == 1) {
+                Node* die;
+                for (Edge* b : e->to->adj) {
+                    if (b->original == 1) {
+                        die = b->to;
+                    }
+                }
+                for (size_t i = 0; i < graph.size(); i++) {
+                    if (graph[i] == die) {
+                        die_nums.push_back(i - 1);
+                    }
+                }
+                count++;
+            }
+        }
+        if (count == desired_word.size()) {
+            for (size_t i = 0; i < die_nums.size() - 1; i++) {
+                printf("%d,", die_nums[i]);
+            }
+            printf("%d: ", die_nums.back());
+            printf("%s\n", desired_word.c_str());
         } else {
-            printf("cannot spell %s\n", input.c_str());
+            printf("Cannot spell %s\n", desired_word.c_str());
+        }
+
+        for (Node* n : graph) {
+            for (Edge* e : n->adj) {
+                delete e;
+            }
+            delete n;
         }
     }
 }

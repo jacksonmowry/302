@@ -25,8 +25,8 @@ if [ "$c" != "$y" ]; then
   exit 1
 fi
 
-if [ `/home/jplank/cs302/Labs/Lab9/double-check-correct "$1" < "$2" | wc | awk '{ print $1 }'` -ne 0 ]; then
-   /home/jplank/cs302/Labs/Lab9/double-check-correct "$1" < "$2" 
+if [ `./double-check-correct "$1" < "$2" | wc | awk '{ print $1 }'` -ne 0 ]; then
+   ./double-check-correct "$1" < "$2"
   exit 1
 fi
 
