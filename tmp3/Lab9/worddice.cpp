@@ -1,4 +1,5 @@
 #include <algorithm>
+#include <cassert>
 #include <cstdint>
 #include <fstream>
 #include <map>
@@ -16,6 +17,7 @@ struct Edge {
     int original;
     int residual;
     int flow;
+    bool tmp;
 };
 
 enum NodeType {
@@ -78,9 +80,10 @@ int main(int argc, char** argv) {
     while (dice >> input) {
         graph.push_back(new Node{DIE, {0}, 0, {}, nullptr});
         graph.back()->adj.push_back(
-            new Edge{graph.back(), graph[0], nullptr, 0, 1, 1});
+            new Edge{graph.back(), graph[0], nullptr, 0, 1, 1, false});
         graph[0]->adj.push_back(new Edge{graph[0], graph.back(),
-                                         graph.back()->adj.back(), 1, 0, 0});
+                                         graph.back()->adj.back(), 1, 0, 0,
+                                         false});
         for (auto c : input) {
             graph.back()->letters[c] = true;
         }
@@ -90,6 +93,13 @@ int main(int argc, char** argv) {
         // need to reset all edges back to default values first
         for (Node* n : graph) {
             n->backedge = nullptr;
+            size_t prev = n->adj.size();
+            for (ssize_t i = n->adj.size() - 1; i >= 0; i -= 1) {
+                if (n->adj[i]->tmp) {
+                    n->adj.erase(n->adj.begin() + i);
+                }
+            }
+            assert(prev >= n->adj.size());
             for (size_t i = 0; i < n->adj.size() - 1; i += 2) {
                 if (n->adj[i]->residual == 1) {
                     // reverse edge
@@ -101,22 +111,22 @@ int main(int argc, char** argv) {
                 }
             }
         }
-        //
-        //
+
         vector<Node*> copy = graph;
         size_t first_letter = copy.size();
         for (auto c : input) {
             copy.push_back(new Node{LETTER, {0}, 0, {}, nullptr});
             copy.back()->letters[c] = true;
-            for (size_t i = 1; i < copy.size() && copy[i]->type == DIE; i++) {
+            for (size_t i = 1; i < copy.size() && copy[i]->type == DIE;
+                 i++) {
                 if (copy[i]->letters[c]) {
-                    copy.back()->adj.push_back(new Edge{copy.back(), copy[i],
-                                                        nullptr, 0, 1,
-                                                        1}); // reverse edge
-                    copy[i]->adj.push_back(new Edge{copy[i],
-                                                    copy.back(), // actual edge
-                                                    copy.back()->adj.back(), 1,
-                                                    0, 0});
+                    copy.back()->adj.push_back(
+                        new Edge{copy.back(), copy[i], nullptr, 0, 1, 1,
+                                 true}); // reverse edge
+                    copy[i]->adj.push_back(
+                        new Edge{copy[i],
+                                 copy.back(), // actual edge
+                                 copy.back()->adj.back(), 1, 0, 0, true});
                     copy.back()->adj.back()->reverse = copy[i]->adj.back();
                 }
             }
@@ -127,9 +137,10 @@ int main(int argc, char** argv) {
         // Make letters point to the sink
         for (size_t i = first_letter; i < copy.size() - 1; i++) {
             copy.back()->adj.push_back(
-                new Edge{copy.back(), copy[i], nullptr, 1, 0, 1});
+                new Edge{copy.back(), copy[i], nullptr, 1, 0, 1, true});
             copy[i]->adj.push_back(new Edge{copy[i], copy.back(),
-                                            copy.back()->adj.back(), 1, 0, 0});
+                                            copy.back()->adj.back(), 1, 0,
+                                            0, true});
             copy.back()->adj.back()->reverse = copy[i]->adj.back();
         }
 
