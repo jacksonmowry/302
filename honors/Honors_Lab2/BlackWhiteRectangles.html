@@ -1,0 +1,619 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title> TCO 2008 Q2 1000-pointer (BlackWhiteRectangles)</title>
+</head><body><h3>TCO 2008 Q2 1000-pointer (BlackWhiteRectangles)</h3>
+<h3>James S. Plank</h3>
+Mon Nov 4 13:21:14 EST 2013.<br>
+Latest modification: Thu Sep 22 13:40:25 EDT 2016
+<hr>
+
+<ul>
+<li><a href="https://community.topcoder.com/stat?c=problem_statement&amp;pm=14387&amp;rd=16803">Problem Statement</a>.
+<p>
+</p></li><li> <b>Problem Given in Topcoder</b>: 2008
+</li><li> <b>Competitors who opened the problem</b>: 1086
+</li><li> <b>Competitors who submitted a solution</b>: 148
+</li><li> <b>Number of correct solutions</b>: 62
+</li><li> <b>Accuracy (percentage correct vs those who opened)</b>: 5.7%
+</li><li> <b>Accuracy (percentage correct vs those who submitted)</b>: 41.9
+</li><li> <b>Average Correct Time</b>: 46 minutes, 26 seconds.
+</li></ul>
+
+<hr>
+<h3>If Topcoder's Servers are Down</h3>
+
+Here is a summary of the problem:
+
+<ul>
+<li> You are dealing with the cartesian coordinate system from (0,0) to (40000,40000).
+</li><li> You will be given a collection of rectangles, specified as <i>(x<sub>1</sub>,
+y<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>, type)</i>.
+</li><li> For each of <i>(x<sub>1</sub>, y<sub>1</sub>)</i> is the lower left corner, and
+<i>(x<sub>2</sub>, y<sub>2</sub>)</i> is the upper right corner.
+</li><li> Each of these rectangles contains
+<i>(x<sub>2</sub>-x<sub>1</sub>)*(y<sub>2</sub>-y<sub>1</sub>)</i> 1x1 squares.
+Initially in the entire coordinate system, all 1x1 squares are colored white.
+</li><li> Each rectangle will (potentially) color some squares black.  How it does so,
+depends on the <i>type</i>, where the lower left corner of each of these pictures goes at 
+<i>(x<sub>1</sub>, y<sub>1</sub>)</i>, and the patterns repeat to fill the rectangle.
+<p></p><center><table border="3"><tbody><tr><td align="center"><img src="BlackWhiteRectangles_files/type-1.jpg"><br>Type 1</td>
+                           <td align="center"><img src="BlackWhiteRectangles_files/type-2.jpg"><br>Type 2</td>
+                           <td align="center"><img src="BlackWhiteRectangles_files/type-3.jpg"><br>Type 3</td>
+                           <td align="center"><img src="BlackWhiteRectangles_files/type-4.jpg"><br>Type 4</td></tr></tbody></table></center><p>
+</p></li><li> The rectangles are given as a vector of strings, where each string contains
+<i>x<sub>1</sub>, y<sub>1</sub>, x<sub>2</sub>, y<sub>2</sub>,</i> and <i>type</i> separated
+by spaces.
+</li><li> In the specifications, 
+<i>x<sub>2</sub></i> will be greater than <i>x<sub>1</sub></i>, and 
+<i>y<sub>2</sub></i> will be greater than <i>y<sub>1</sub></i>.
+</li><li> All of the <i>x</i> and <i>y</i> values will be between 0 and 40,000.
+</li><li> Return the number of black squares.
+</li></ul>
+
+<hr>
+<h3>Examples</h3>
+
+<pre>Example 0:
+  {"1 1 6 8 1",
+   "11 1 16 8 2",
+   "1 11 6 18 3",
+   "11 11 16 18 4"}
+Returns: 82
+</pre>
+Here is a drawing of the relevant part of the grid:
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/example-0.jpg" width="300"></td></tr></tbody></table></center><p>
+
+</p><pre>Example 1:
+{"1 1 11 11 1",
+ "1 1 11 11 2",
+ "9 9 19 19 3",
+ "9 9 19 19 4"} 
+Returns: 172
+</pre>
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/example-1.jpg" width="300"></td></tr></tbody></table></center><p>
+
+</p><pre>Example 2:
+{"1 6 9 9 1"
+ "1 9 7 10 1",
+ "1 5 8 7 1",
+ "2 6 8 8 1",
+ "2 1 3 4 1"}
+Returns: 40
+</pre>
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/example-2.jpg" width="300"></td></tr></tbody></table></center><p>
+
+</p><pre>Example 3:
+{"7 5 9 6 4",
+ "6 3 9 6 4",
+ "8 3 9 8 4",
+ "5 9 10 10 4",
+ "5 3 8 5 4"}
+Returns: 13
+</pre>
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/example-3.jpg" width="300"></td></tr></tbody></table></center><p>
+
+</p><pre>Example 4:
+{"7 1 10 3 1",
+ "8 2 9 7 4",
+ "5 3 7 4 3",
+ "4 3 9 4 2",
+ "3 1 9 2 1"}
+Returns: 13
+</pre>
+<p></p><center><table border="4"><tbody><tr><td><img src="BlackWhiteRectangles_files/example-4.jpg" width="400"></td></tr></tbody></table></center><p>
+
+</p><pre>Example 5:
+{ "1  12  7 16  3",
+   2  10  7 13  3",
+   2   2 10 11  4" };
+Returns: 54
+</pre>
+<hr>
+<h3>tests.sh and answers.txt</h3>
+
+<b>tests.sh</b> uses the program <b>gen_input</b>.  You can compile it with the makefile.
+When you run it, the output should be identical to <b>answers.txt</b>.
+<p>
+</p><hr>
+<h3>Hints</h3>
+
+This one is fun.  Let me give you the general outline.  
+You can't simulate the process directly because the constraints are too large.  
+Instead, you should break up the region into 
+smaller rectangles, where each rectangle has the same patterns applied to it.
+You then note which patterns are applied to the rectangles, and calculate the 
+number of black squares in each rectangle.  Sum them up and you're done.
+<p>
+I'll give an example here, which is example 5 above:
+
+</p><pre>{ "1  12  7 16  3",
+   2  10  7 13  3",
+   2   2 10 11  4" };
+</pre>
+
+This results in the following grid -- I've drawn the outlines of the three
+rectangles in different colors:
+
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/BWR1.jpg" width="300"></td></tr></tbody></table></center><p>
+
+Now, what I did was split up my grid into rectangles.  Order all of the x1's and x2's,
+and all of the y1's and y2's:
+</p><ul>
+<li> X's: { 1, 2, 7, 10 }
+</li><li> Y's: { 2, 10, 11, 12, 13, 16 }
+</li></ul>
+
+For each consecutive pair of X's and Y's, there is a rectangle defined that has
+had the exact same patterns applied to it.  Your job is to split up the grid into
+these rectangles, and identify the pattern applied to it.  I'm going to do that
+pictorally below:
+
+<p></p><center><table border="3"><tbody><tr><td><img src="BlackWhiteRectangles_files/BWR2.jpg" width="300"></td></tr></tbody></table></center><p>
+
+The way I identified patterns was as 2x2 grids, which represent how each rectangle is
+colored, as long as the grid starts on an even row and column.  For example, pattern "A"
+is used when a rectangle has all of the even columns black and odd columns white.  
+Pattern "D" has all of the even columns white and the odd columns black.
+</p><p>
+Once you have your grid broken into rectangles, and you have identified the patter
+for each rectangle, then you determine how many black squares are set in each rectangle.
+That takes a little effort, because you have to consider whether the starting rows/columns
+are even or odd, and whether the width/height is even or odd.
+</p><p>
+In this example, the upper-left rectangle will be counted as having zero black squares,
+because it is pattern "A", but it starts on an odd column.  The rectangle to its right
+will add 9 black squares, because it is a 5x3 rectangle of pattern "A", starting on an 
+even column (yes, it starts on an odd row too, but that doesn't matter in this case).
+</p><p>
+I used bit arithmetic and single ints to hold the patterns.  You may want to give that
+some thought, as I found it was easier.
+</p><p>
+Good luck -- this one is fun, but takes some attention to detail.
+
+</p><hr>
+<h3>More Help</h3>
+
+Here's a little more help, in case the above explanation is leaving you wanting.  All
+of this is with respect to the example above.  The first thing that I did was define all
+of the rectangles, in terms of their lower-left positions, widths and heights:
+
+<p>
+</p><center><table border="3">
+<tbody><tr><td align="center">X</td>
+    <td align="center">Y</td>
+    <td align="center">Width</td>
+    <td align="center">Height</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">2</td>
+    <td align="center">1</td>
+    <td align="center">8</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">10</td>
+    <td align="center">1</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">11</td>
+    <td align="center">1</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">12</td>
+    <td align="center">1</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">13</td>
+    <td align="center">1</td>
+    <td align="center">3</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">2</td>
+    <td align="center">5</td>
+    <td align="center">8</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">10</td>
+    <td align="center">5</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">11</td>
+    <td align="center">5</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">12</td>
+    <td align="center">5</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">13</td>
+    <td align="center">5</td>
+    <td align="center">3</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">2</td>
+    <td align="center">3</td>
+    <td align="center">8</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">10</td>
+    <td align="center">3</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">11</td>
+    <td align="center">3</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">12</td>
+    <td align="center">3</td>
+    <td align="center">1</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">13</td>
+    <td align="center">3</td>
+    <td align="center">3</td></tr>
+</tbody></table></center><p>
+
+I had a <b>struct</b> for each rectangle, which contained these fields, plus the "pattern".
+I stored the pattern as an int, and I only used the lower four bits of the int:
+
+</p><ul>
+<li> Lowest bit: lower left-hand bit of the pattern.  This is the bit that is set in even 
+rows and even columns.
+</li><li> Next bit: lower right-hand bit of the pattern.  This is the bit that is set in even 
+rows and odd columns.
+</li><li> Next bit: upper left-hand bit of the pattern.  This is the bit that is set in odd 
+rows and even columns.
+</li><li> Next bit: upper right-hand bit of the pattern.  This is the bit that is set in odd 
+rows and odd columns.
+</li></ul>
+
+For example: 
+<ul>
+<li> the pattern <b>A</b> above would be represented as 0x5.  
+</li><li> The pattern <b>B</b> above would be represented as 0x0.  
+</li><li> The pattern <b>C</b> above would be represented as 0xf.  
+</li><li> The pattern <b>D</b> above would be represented as 0xa.  
+</li><li> The pattern <b>E</b> above would be represented as 0xb.  
+</li><li> The pattern <b>F</b> above would be represented as 0x9.  
+</li></ul>
+
+Next, I went through each input rectangle, and determined the pattern of the rectangle.
+You'll note that the pattern depends both on the "type" of the pattern, and on whether the
+starting row/column is even or odd.  Let's process the first rectangle: [1, 12, 7, 16, 3].
+In this pattern, the even numbered columns are block, so the pattern is pattern <b>A</b>,
+or 0x5.  So, you go through each of the rectangles in your map that correspond to the
+first rectangle, and you can do a binary
+or of 0x5 with the patterns that are there already:
+
+<p>
+</p><center><table border="3">
+<tbody><tr><td align="center">X</td>
+    <td align="center">Y</td>
+    <td align="center">Width</td>
+    <td align="center">Height</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">2</td>
+    <td align="center">1</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">10</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">11</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">12</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">13</td>
+    <td align="center">1</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">2</td>
+    <td align="center">5</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">10</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">11</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">12</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">13</td>
+    <td align="center">5</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">2</td>
+    <td align="center">3</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">10</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">11</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">12</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">13</td>
+    <td align="center">3</td>
+    <td align="center">3</td>
+    <td align="center">0x0</td></tr>
+</tbody></table></center><p>
+
+Next, let's process the second rectangle: [2, 10, 7, 13, 3].
+In this pattern, the odd numbered columns are block, so the pattern is pattern <b>D</b>,
+or 0xa.  So, you go through each of the rectangles in your map that belong to the second
+rectangle, and you can do a binary
+or of 0xa with the patterns that are there already:
+
+</p><p>
+</p><center><table border="3">
+<tbody><tr><td align="center">X</td>
+    <td align="center">Y</td>
+    <td align="center">Width</td>
+    <td align="center">Height</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">2</td>
+    <td align="center">1</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">10</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">11</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">12</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">13</td>
+    <td align="center">1</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">2</td>
+    <td align="center">5</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">10</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xa</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">11</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xa</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">12</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xf</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">13</td>
+    <td align="center">5</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">2</td>
+    <td align="center">3</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">10</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">11</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">12</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">13</td>
+    <td align="center">3</td>
+    <td align="center">3</td>
+    <td align="center">0x0</td></tr>
+</tbody></table></center><p>
+
+Next, let's process the last rectangle: [2, 2, 10, 11, 4].
+This is a checkerboard, where the lower-left and upper-right corners are set: Pattern
+<b>F</b>, which is 0x9.
+So, you go through each of the rectangles in your map that belong to the last
+rectangle, and you can do a binary
+or of 0x9 with the patterns that are there already:
+
+</p><p>
+</p><center><table border="3">
+<tbody><tr><td align="center">X</td>
+    <td align="center">Y</td>
+    <td align="center">Width</td>
+    <td align="center">Height</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">2</td>
+    <td align="center">1</td>
+    <td align="center">8</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">10</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">11</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">12</td>
+    <td align="center">1</td>
+    <td align="center">1</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">1</td>
+    <td align="center">13</td>
+    <td align="center">1</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">2</td>
+    <td align="center">5</td>
+    <td align="center">8</td>
+    <td align="center">0x9</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">10</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xb</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">11</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xa</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">12</td>
+    <td align="center">5</td>
+    <td align="center">1</td>
+    <td align="center">0xf</td></tr>
+<tr><td align="center">2</td>
+    <td align="center">13</td>
+    <td align="center">5</td>
+    <td align="center">3</td>
+    <td align="center">0x5</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">2</td>
+    <td align="center">3</td>
+    <td align="center">8</td>
+    <td align="center">0x9</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">10</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x9</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">11</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">12</td>
+    <td align="center">3</td>
+    <td align="center">1</td>
+    <td align="center">0x0</td></tr>
+<tr><td align="center">7</td>
+    <td align="center">13</td>
+    <td align="center">3</td>
+    <td align="center">3</td>
+    <td align="center">0x0</td></tr>
+</tbody></table></center><p>
+
+Now, for each rectangle, you have the following information:
+
+</p><ul>
+<li> X value of lower-left corner.
+</li><li> Y value of lower-left corner.
+</li><li> Width
+</li><li> Height
+</li><li> Pattern
+</li></ul>
+
+For each rectangle, you can now determine how many black squares are set.  Do this with
+a nested <b>for</b> loop:
+
+<pre>for (i = 0; i &lt; 2; i++) {
+  for (j = 0; j &lt; 2; j++) {
+    If the cell corresponding to column i and row j in the pattern is set, then {
+      Count the number of cells in the rectangle whith x%2 = i, and y%2 = j.
+      Add these to the total sum.
+    }
+  }
+}
+</pre>
+
+For example, consider the rectangle [2, 2, 5, 8]:
+<ul>
+<li> When i=0 and j=0, the bit in the pattern (0x9) is set.  
+     You can count 3 even columns in the rectangle and 4 even rows, so add 12 black rectangles.
+</li><li> When i=0 and j=1, the bit in pattern 0x9 is not set.
+</li><li> When i=1 and j=0, the bit in pattern 0x9 is not set.
+</li><li> When i=1 and j=1, the bit in pattern 0x9 is.
+     You can count 2 odd columns in the rectangle and 4 odd rows, so add 8 black rectangles.
+</li></ul>
+
+I hope that helps you, if you're having trouble.
+     
+<hr>
+<h3>Smore more help if your program is too slow</h3>
+
+This comes from a Piazza posting:<p>
+
+<i><b>Matching created rectangles to input rectangles efficiently:</b>
+In honors lab2, my program is correct but runs slow; I believe the 
+reason why it runs slow is because of how I determine every input 
+rectangle that each created rectangle corresponds to, needed to 
+determine the patterns. I've written it in two completely different ways
+ that work, but I can't figure out how to optimize this part. Is there 
+an obvious solution I'm missing? Thanks.</i>
+
+</p><p>
+<b>James S. Plank:</b>
+Do "sh -x tests.sh" and let me know the number of a test that is taking too long.Â&nbsp;Â&nbsp;
+</p><p>
+
+<i><b>(Anon. Comp to classmates):</b>
+Test 71 is one that takes longer than most others.</i>
+
+</p><p>
+
+ <b>James S Plank 2: </b> OK -- so there are 100 input 
+rectangles.Â&nbsp; When you look at the unique x and y values here, 
+there are 169 unique x values and 172 unique y values.Â&nbsp; That means
+ you need to test 168*171 =
+28728 rectangles.Â&nbsp; For each of these, you check it with the 100 
+input rectangles to see how many black squares there are.Â&nbsp; So:
+
+</p><pre>Iterate x values (168)
+Â&nbsp; Iterate y values (171)
+Â&nbsp; Â&nbsp; Iterate input rectangles (100)
+Â&nbsp; Â&nbsp; Â&nbsp; Â&nbsp;Update number of black squares in the x/y rectangle: O(1)
+</pre>
+
+There will be 2,872,800 iterations, each of which should be quick: 
+O(1).Â&nbsp; This should take under a tenth of a second (my code is 
+0.076 seconds).Â&nbsp; I hope that helps.
+
+</body></html>
