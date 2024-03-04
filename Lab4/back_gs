@@ -16,7 +16,6 @@ else
 fi
   
 program=matrix_enum
-sprogram=matrix_enum_solution
   
 if [ ! -f $program ]; then
   echo "Problem $enum is incorrect."
@@ -59,7 +58,7 @@ if [ $enum -gt 50 -a $enum -le 100 ]; then
     rm -f tmp-$enum-test-stdout.txt tmp-$enum-test-stderr.txt tmp-$enum-correct-stdout.txt tmp-$enum-correct-stderr.txt
   fi
 else 
-  ( $dir/$sprogram $params | $dir/flatten_for_grading | sort ) > tmp-$enum-correct-stdout.txt 2> tmp-$enum-correct-stderr.txt
+  ( $dir/$program $params | $dir/flatten_for_grading | sort ) > tmp-$enum-correct-stdout.txt 2> tmp-$enum-correct-stderr.txt
   ( ./$program $params | $dir/flatten_for_grading | sort ) > tmp-$enum-test-stdout.txt 2> tmp-$enum-test-stderr.txt
   call="./$program $params | $dir/flatten_for_grading | sort"
   
