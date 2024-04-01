@@ -1,0 +1,276 @@
+<html><head>
+<meta http-equiv="content-type" content="text/html; charset=windows-1252"><title>SRM 738, D1, 250-Pointer (FindThePerfectTriangle)</title>
+</head><body><h3>SRM 738, D1, 250-Pointer (FindThePerfectTriangle)</h3>
+<h3>James S. Plank</h3>
+Tue Oct  9 15:18:25 EDT 2018
+<hr>
+
+<ul>
+<li><a href="http://community.topcoder.com/stat?c=problem_statement&amp;pm=15109&amp;rd=17270">Problem Statement</a>.
+</li><li> <a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/main.cpp">A <b>main()</b> with the examples compiled in.</a>
+</li><li> <a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/FindThePerfectTriangle.cpp">A skeleton that compiles with <b>main.cpp</b>.</a>
+</li><li> <b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/confirm.cpp">confirm.cpp</a></b> -- A program that will confirm whether a triangle
+     is correct for the given area and perimeter.
+</li><li> <b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/grader.sh">grader.sh</a></b> -- A shell script to grade your program.
+</li><li> <b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/randinput.txt">randinput.txt</a></b> -- 100 random inputs.  Half of them have
+     valid triangles, and half of them do not.
+<p>
+</p></li><li> <b>Problem Given in Topcoder</b>: September, 2018
+</li><li> <b>Competitors who opened the problem</b>: 148
+</li><li> <b>Competitors who submitted a solution</b>: 123
+</li><li> <b>Number of correct solutions</b>: 57 
+</li><li> <b>Accuracy (percentage correct vs those who opened)</b>: 38.5%
+</li><li> <b>Average Correct Time</b>: 27 minutes, 54 seconds.
+</li></ul>
+
+<hr>
+<h3>In case Topcoder's servers are down</h3>
+
+Here is a summary of the problem:
+
+<ul>
+<li> You are given two integers, which represent the perimeter and area of a triangle.
+</li><li> Your job is to return the coordinates of a triangle that has integer coordinates, and
+     whose perimeter and area are the given perimeter and area.
+</li><li> Return the coordinates as a vector.  If the three points of the triangle are
+<i>(x<sub>1</sub>,y<sub>1</sub>),</i>
+<i>(x<sub>2</sub>,y<sub>2</sub>)</i> and
+<i>(x<sub>3</sub>,y<sub>3</sub>),</i>, then you should return the vector
+<i>{ x<sub>1</sub>, y<sub>1</sub>,
+     x<sub>2</sub>, y<sub>2</sub>,
+     x<sub>3</sub>, y<sub>3</sub> }</i>.
+</li><li> If there is no such triangle, then return an empty vector.
+</li><li> If there are multiple triangles that work, return any one of them.
+</li><li> The area will between 1 and 1,000,000, and the perimeter will be between 1 and 1,000.
+</li><li> Your coordinates must be between 0 and 3,000.
+</li></ul>
+
+<hr>
+<h3>The examples</h3>
+
+<pre>#        area    perimeter      answer
+-    --------    ---------      -------------------------------
+0           6           11      { }
+1           6           12      { 1, 1, 1, 4, 5, 4 }
+2       37128          882      { 137, 137, 273, 410, 1, 410 }
+3          12           18      { 1, 1, 4, 5, 1, 9 }
+4       18096          928      { 1, 1, 1, 88, 417, 88 }
+5     1000000         1000      { }
+</pre>
+
+<hr>
+<h3>Testing yourself</h3>
+
+This is a hard one to test, but here's what I have.  I have 100 input values in
+<b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/randinput.txt">randinput.txt</a></b>.  As you can see, each pair of input
+values is followed by "yes" or "no".  If "no", then there's no valid answer for this
+area and perimeter.  If "yes", then there is a valid answer.
+<p>
+There is a program here called <b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/confirm.cpp">confirm.cpp</a></b>.
+Compile it with:
+
+</p><pre>UNIX&gt; <font color="darkred"><b>g++ -o confirm confirm.cpp</b></font>
+</pre>
+
+You give it 8 inputs -- area, perimeter, and the three points.  If the three points make
+a valid triangle for the area and perimeter, it will print "Good".  Otherwise, it will
+print some error message.
+<p>
+So:
+</p><pre>UNIX&gt; <font color="darkred"><b>echo 6 12 1 1 1 4 5 4 | ./confirm</b></font>
+Good
+UNIX&gt; <font color="darkred"><b>echo 6 11 1 1 1 4 5 4 | ./confirm</b></font>
+Perimeters don't match
+UNIX&gt; <font color="darkred"><b></b></font>
+</pre>
+<p>
+
+Compile your program using <b>main.cpp</b> into <b>a.out</b>.  Then run the shell 
+script <b><a href="https://web.eecs.utk.edu/~jplank/topcoder-writeups/2018/FindThePerfectTriangle/grader.sh">grader.sh</a></b>.
+You should see it print one test per line, and it will print "ok" if you pass each test.
+
+</p><hr>
+<h2>Hints</h2>
+As always with Topcoder, we are confronted with a decision of whether to be smart, or
+whether to take a simplistic approach and see if it completes in time.  As usual, the
+second approach seems to work better.
+<p>
+The simplistic approach is to enumerate.  However, you cannot enumerate triangle points, 
+even those that include the origin, because
+there are way too many of those.  It's better to try to enumerate sides of the triangle.
+The reason is that the sides have to have integer endpoints and integer lengths.  Any fractional
+lengths will be irrational numbers, and cannot sum to an integer perimeters.  So, let's try 
+to enumerate all potential sides of the triangles.
+</p><p>
+What I did was enumerate all potential <i>(x,y)</i> pairs, and for each of these, I determined
+whether the line from (0,0) to <i>(x,y)</i> had an integer length.  I did this for <i>x</i>
+and <i>y</i> up to 3000.
+</p><p>
+For a value of <i>x</i> and <i>y</i>, suppose I found that the line has an integer length.
+Then I store the <i>x</i> and <i>y</i> values in a vector associated with the length.  Here
+are the vectors for lengths from 1 to 29:
+
+</p><pre>length     (x,y) pts such that (0,0)-(x,y) has length
+------     ------------------------------------------
+ 1         (0,1) (1,0)
+ 2         (0,2) (2,0)
+ 3         (0,3) (3,0)
+ 4         (0,4) (4,0)
+ 5         (0,5) (3,4) (4,3) (5,0)
+ 6         (0,6) (6,0)
+ 7         (0,7) (7,0)
+ 8         (0,8) (8,0)
+ 9         (0,9) (9,0)
+10         (0,10) (6,8) (8,6) (10,0)
+11         (0,11) (11,0)
+12         (0,12) (12,0)
+13         (0,13) (5,12) (12,5) (13,0)
+14         (0,14) (14,0)
+15         (0,15) (9,12) (12,9) (15,0)
+16         (0,16) (16,0)
+17         (0,17) (8,15) (15,8) (17,0)
+18         (0,18) (18,0)
+19         (0,19) (19,0)
+20         (0,20) (12,16) (16,12) (20,0)
+21         (0,21) (21,0)
+22         (0,22) (22,0)
+23         (0,23) (23,0)
+24         (0,24) (24,0)
+25         (0,25) (7,24) (15,20) (20,15) (24,7) (25,0)
+26         (0,26) (10,24) (24,10) (26,0)
+27         (0,27) (27,0)
+28         (0,28) (28,0)
+29         (0,29) (20,21) (21,20) (29,0)
+</pre>
+
+There are 3370 such lengths, and the most values of <i>(x,y)</i> that a length has is 28.
+These numbers allow us to do a tractable enumeration.
+
+<hr>
+<h3>Using the Triangle Inequality</h3>
+
+The Triangle Inequality helps us with the enumeration.  The Triangle Inequality states that
+if we sort the lengths of a triangle's sides to be <i>a &#8804; b &#8804; c</i>, then we know
+that <i>b &#8804; c &lt; a + b</i>.  That allows us to enumerate as follows (<i>p</i> is the
+perimeter):
+
+<ul>
+<li> Enumerate all possible sides <i>a &#8804; p/3</i> .
+</li><li> Enumerate all possible sides <i>b &#8805; a &#8804; p/3</i>.
+</li><li> Calculate side <i>c = p - a - b</i>.
+</li><li> If <i>c &#8805; b</i>, and <i>a</i>, <i>b</i> and <i>c</i> are ok according to the triangle inequality,
+     then this is a potential answer.  Call <b>Is_Triangle_OK(<i>a, b, c</i>)</b>.
+</li><li> Otherwise, keep enumerating.
+</li></ul>
+
+Here are the potential triangles for examples 0, 1 and 4, where the perimeters equal 
+11, 12 and 18.   You'll note that
+we might not be able to construct triangles with these lengths and integer coordinates; however
+these are lengths that fit the triangle inequality and have the given perimeter.
+
+<p></p><center><table border="3">
+<tbody><tr><td valign="top">
+<u>Example 0</u>
+<pre>Is_Triangle_OK(1, 5, 5)
+Is_Triangle_OK(2, 4, 5)
+Is_Triangle_OK(3, 3, 5)
+Is_Triangle_OK(3, 4, 4)
+</pre>
+</td>
+<td valign="top">
+<u>Example 1</u>
+<pre>Is_Triangle_OK(2, 5, 5)
+Is_Triangle_OK(3, 4, 5)
+Is_Triangle_OK(4, 4, 4)
+</pre>
+</td>
+<td valign="top">
+<u>Example 2</u>
+<pre>Is_Triangle_OK(2, 8, 8)
+Is_Triangle_OK(3, 7, 8)
+Is_Triangle_OK(4, 6, 8)
+Is_Triangle_OK(4, 7, 7)
+Is_Triangle_OK(5, 5, 8)
+Is_Triangle_OK(5, 6, 7)
+Is_Triangle_OK(6, 6, 6)
+</pre>
+</td>
+</tr></tbody></table></center><p>
+
+</p><hr>
+Time to write <b>Is_Triangle_OK(<i>a, b, c</i>)</b>.  This has two parts:
+<ol>
+<li> Does the area of this triangle equal the given area?
+</li><li> Can you make the triangle with integer coordinates?
+</li></ol>
+
+Let's answer the first question.  I'm not sure how well-known <i>Heron's Formula</i> is, but
+when I googled "Calculating the area of a triangle from the length of all three sides", I 
+was directed to <a href="https://www.mathopenref.com/heronsformula.html">https://www.mathopenref.com/heronsformula.html</a>, which tells me that the area is:
+<p></p><center>
+<i>sqrt( q (q-a)(q-b)(q-c) )</i>
+</center><p>
+Where <i>q</i> is the perimeter over two.  Who knew?  Well, now I know.  And you know.  
+And that's an easy calculation.  The area is only going to be an integer, btw, if 
+<i>q</i> is an integer, so the perimeter has to be a multiple of two.  Given that, it's
+best to simply calculate the square of the area to see if it equals the square of the
+given area.  That way, you avoid floating point issues.
+</p><p>
+So, go ahead and write that code.  That's the first test of your 
+<b>Is_Triangle_OK(<i>a, b, c</i>)</b>.  
+</p><p>
+Your last task is to find coordinates if you have a valid <i>(a, b, c)</i>.  To do that,
+what I did was another enumeration:
+
+</p><ul>
+<li> Enumerate all possible <i>(x,y)</i> values for <i>c</i>.  Set the first two points of
+your triangle to <i>(0,0)</i> and <i>(x,y)</i>.  
+</li><li> Now, enumerate all possible <i>(x',y')</i> values for <i>a</i>.  Set the third point
+of your triangle to <i>(x',y')</i>.
+</li><li> From these three points, you can calculate the length for the <i>b</i> side.  If it
+equals <i>b</i>, then you've got an answer!  
+Convert those triangle points to points that are &#8805; 0, and you're done.
+(BTW, best to calculate the square of the length and compare to the square of <i>b</i>).
+</li><li> You should try again with <i>(x',-y')</i>.  Just saying.
+</li></ul>
+
+<hr>
+<h3>An example, please?</h3>
+
+Let's do example 1, where the perimeter is 12 and the area is 6.  As I said above, the
+<b>Is_Triangle_OK</b> calls are:
+
+<pre>Is_Triangle_OK(2, 5, 5)
+Is_Triangle_OK(3, 4, 5)
+Is_Triangle_OK(4, 4, 4)
+</pre>
+
+Checking the areas, you'll see that only the (3, 4, 5) combination has an area of 12.  Let's
+look at the <i>(x,y)</i> values for lengths 3, 4 and 5 (from above):
+
+<pre> 3         (0,3) (3,0)
+ 4         (0,4) (4,0)
+ 5         (0,5) (3,4) (4,3) (5,0)
+</pre>
+
+So, we'll start looking at all of the potential points where <i>c = 5</i> and <i>a = 3</i>:
+
+<p></p><center><table border="3">
+<tbody><tr><td align="center">Triangle Points</td><td align="center">Square of the <i>b</i> side.</td></tr>
+<tr><td align="center"><i>(0,0) (0,5) (0,3)</i></td><td align="center">4</td></tr>
+<tr><td align="center"><i>(0,0) (0,5) (0,-3)</i></td><td align="center">64</td></tr>
+<tr><td align="center"><i>(0,0) (0,5) (3,0)</i></td><td align="center">34</td></tr>
+<tr><td align="center"><i>(0,0) (3,4) (0,3)</i></td><td align="center">10</td></tr>
+<tr><td align="center"><i>(0,0) (3,4) (0,-3)</i></td><td align="center">58</td></tr>
+<tr><td align="center"><i>(0,0) (3,4) (3,0)</i></td><td align="center">16</td></tr>
+<tr><td align="center"><i>(0,0) (4,3) (0,3)</i></td><td align="center">16</td></tr>
+<tr><td align="center"><i>(0,0) (4,3) (0,-3)</i></td><td align="center">52</td></tr>
+<tr><td align="center"><i>(0,0) (4,3) (3,0)</i></td><td align="center">10</td></tr>
+<tr><td align="center"><i>(0,0) (5,0) (0,3)</i></td><td align="center">34</td></tr>
+<tr><td align="center"><i>(0,0) (5,0) (0,-3)</i></td><td align="center">34</td></tr>
+<tr><td align="center"><i>(0,0) (5,0) (3,0)</i></td><td align="center">4</td></tr>
+</tbody></table></center><p>
+
+As you can see, when the triangle is <i>(0,0) (3,4) (3,0)</i>, the square of the <i>b</i>
+side is 4<sup>2</sup>, so we have our answer!
+</p></body></html>
